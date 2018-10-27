@@ -28,8 +28,8 @@ def recuit_f1 (x0, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=> Tempera
 	T = 1/t0
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
 	
-	while t < tmax   : # rmq nb max iter implique une condition sur la fct de cout
-		#or A_rate > A_rate_max
+	while t < tmax  and A_rate > A_rate_max : # rmq nb max iter implique une condition sur la fct de cout
+		
 		xx = x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )	
 		ff = f_1(xx)
 		if ff < f[-1]:
@@ -47,13 +47,14 @@ def recuit_f1 (x0, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=> Tempera
 		t+=1 	# Pas de convergence	
 		T  = 1 / t 		
 		A_rate = len(x)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
-
-	return  x,f,x_all,f_all		
+		print(A_rate)
+	return  x,f,x_all,f_all, t		
 
 ###############################################################################################
 #								MAIN														  #	
 ###############################################################################################
 Which_question  = int(input('Which question ?	'))
+
 if Which_question==1:
 	X = np.arange(-6,6,0.1)
 	fig = plt.figure(1)
@@ -61,9 +62,10 @@ if Which_question==1:
 	plt.xlabel('x')
 	plt.ylabel('f(x)')	
 	plt.show()
+	print('min de f1  :  ',min(f_1(X)))
 	
 if Which_question==2:
-	S = recuit_f1 ( -5, 1, 10, 0.5 ,  100 ,  10**-5 )
+	S = recuit_f1 ( -5, 1, 10, 0.5 ,  10000 ,  0.2 )
 	X = np.arange(-6,6,0.1)
 	fig = plt.figure(1)
 	plt.plot(X, f_1(X))
@@ -71,3 +73,6 @@ if Which_question==2:
 	plt.xlabel('x')
 	plt.ylabel('f(x)')	
 	plt.show()
+
+	print(min(S[1]))
+	print((S[4]))
