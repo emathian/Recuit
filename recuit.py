@@ -8,6 +8,7 @@ from math import exp, expm1 , log
 from numpy import random
 import pandas as pd
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import cm
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import numpy as np
@@ -24,7 +25,9 @@ def g (x,y):
 	return x**4 -x**3 -20*x**2 + x +1 + y**4 -y**3 -20*y**2 + y +1
 
 
-def recuit_f1 (x0, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=> Temperature
+def recuit_f1 (xd ,xp, t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temperature
+	
+	x0 =random.uniform( xd, xp )
 	x=[x0]
 	f=[f_1(x0)]
 	t=t0
@@ -162,65 +165,84 @@ if Which_question==1:
 	print('min de f1  :  ',min(f_1(X)))
 	
 if Which_question==2:
-	S = recuit_f1 ( -5, 1, 10, 0.5 , 10000, 0.0001 )
+	S = recuit_f1 ( -6, 6, 1,10, 0.5 , 10000, 0.0001 )
 	X = np.arange(-6,6,0.1)
 	fig = plt.figure(1)
-	plt.plot(S[0], S[1] , 'k-x')
-	plt.plot(X, f_1(X),  c='red')
+	plt.plot(S[0], S[1] , '-x', c= 'lightgrey')
+	plt.plot(S[0][-1], S[1][-1] , 'x', c= 'c')
+	plt.plot(X, f_1(X))
 	plt.xlabel('x')
 	plt.ylabel('f(x)')	
+	
+	print(S[0][-1], S[1][-1])
+
+	F = min(f_1(X))
+
+	k = np.arange(0,30,0.5)
+	L_sol_ecart =[]
+	for i in range(len(k)):
+		S = recuit_f1 ( -6, 6, 1,k[i], 0.5 , 10000, 0.0001 )
+		E = (abs(S[1][-1] -F))
+		L_sol_ecart.append(E)
+
+	fig = plt.figure(2)
+	plt.plot(k ,L_sol_ecart,  'x')
+	plt.xlabel('k')
+	plt.ylabel('| f(x_min_calcule) - f(x_opt)|')	
+	
+	print(S[0][-1], S[1][-1])
 
 
-	#T = np.arange(0,1,0.01)
-	#fig = plt.figure(2)
-	#plt.plot(T, 0.1*np.exp(-1/(1000*T)),  c='g') # Aug variance
-	#plt.plot(T, 10*np.exp(-1/(1000*T)),  c='b') # Dim variance
-	#plt.xlabel('x')
-	#plt.ylabel('f(x)')	
-	#plt.show()
+	T = np.arange(1*10**-6 ,1/1000,0.00001)
+	k = [1,5,10,15]
+	fig = plt.figure(3)
+	for i in k:
+		f= i * np.exp(-1/(1000*T))
+		plt.plot(T, f, c=cm.hot(i/15), label=i)
+		plt.legend()
+		plt.xlabel('T')
+		plt.ylabel(' k.e^{-1/(1000*T)}')	
+	
 
-	#print(min(S[1]))
-	#print((S[2]))
+	kp = np.arange(0,1,0.01)
+	L_sol_ecart =[]
+	for i in range(len(kp)):
+		S = recuit_f1 ( -6, 6, 1,10, kp[i] , 10000, 0.0001 )
+		E = (abs(S[1][-1] -F))
+		L_sol_ecart.append(E)
 
-	S1 = recuit_f1 ( 0.5, 1, 15, 0.5 , 10000, 0.0001 )
-	strS1 = ('x0 = 0.5 ; t0 = 1 ; k = 15 ; kp = 0.5 ; tmax =  10000' )
-	S2 = recuit_f1 ( 0.5, 1, 1 , 0.5 , 10000, 0.0001 )
-	strS2 = ('x0 = 0.5 ; t0 = 1 ; k = 1 ; kp = 0.5 ; tmax =  10000' )
-	S3 = recuit_f1 ( 0.5, 1, 10, 0.8 , 10000, 0.0001 )
-	strS3 = ('x0 = 0.5 ; t0 = 1 ; k = 10 ; kp = 0.8 ; tmax =  10000' )
-	S4 = recuit_f1 ( 0.5, 1, 1 , 0.1 , 10000, 0.0001 )
-	strS4 = ('x0 = 0.5 ; t0 = 1 ; k = 10 ; kp = 0.1 ; tmax =  10000' )
-	L_sol=[]
-	L_title=[]
-	L_sol.append(S1)
-	L_sol.append(S2)
-	L_sol.append(S3)
-	L_sol.append(S4)
-	L_title.append(strS1)
-	L_title.append(strS2)
-	L_title.append(strS3)
-	L_title.append(strS4)
-	for i in range(0,5) :
-		fig = plt.figure(i+3)
-		plt.plot(L_sol[i][0], L_sol[i][1] , 'k-x')
-		plt.plot(X, f_1(X),  c='red')	
-		plt.xlabel('x')
-		plt.title(L_title[i])
-		plt.ylabel('f(x)')	
+	fig = plt.figure(4)
+	plt.plot(kp ,L_sol_ecart,  'x')
+	plt.xlabel('kP')
+	plt.ylabel('| f(x_min_calcule) - f(x_opt)|')	
+
+	Tmax = np.arange(0,30000,100)
+	L_sol_ecart =[]
+	for i in range(len(Tmax)):
+		S = recuit_f1 ( -6, 6, 1,10, 0.5 , Tmax[i], 10**-6 )
+		E = (abs(S[1][-1] -F))
+		L_sol_ecart.append(E)
+
+	fig = plt.figure(5)
+	plt.plot(Tmax ,L_sol_ecart,  'x')
+	plt.xlabel('tmax')
+	plt.ylabel('| f(x_min_calcule) - f(x_opt)|')
+	plt.ylim((0,100))	
 	plt.show()
-
-
-
-
+	print(S[0][-1], S[1][-1])
 
 
 if Which_question==3:
-	S = recuit_f1 ( -5, 1, 10, 0.1 , 50, 0.001 )
-	print(S[2])
+	S = recuit_f1 ( -5,5, 1, 12, 0.1 , 20000, 0.0001 )
+
 	X = np.arange(-6,6,0.1)
 	fig = plt.figure(1)
-	plt.plot(S[0], S[1] , 'k-x')
-	plt.plot(X, f_1(X),  c='red')
+	plt.plot(S[0][1], S[1][1] , '-o' ,c='green')
+	plt.plot(S[0], S[1] , '-x' ,c='lightgrey')
+	plt.plot(S[0][-1], S[1][-1] , '-o' ,c='red')
+	plt.plot(S[0][1], S[1][1] , '-o' ,c='green')
+	plt.plot(X, f_1(X))
+
 	plt.xlabel('x')
 	plt.ylabel('f(x)')	
 	plt.show()
