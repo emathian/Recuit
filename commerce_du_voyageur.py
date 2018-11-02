@@ -25,13 +25,26 @@ def cities(L, N):
 	return np.random.rand(N,2) * L
 
 def distance (Trajet, carte):
+	print('Trajet', Trajet)
 	D = 0
 	while len(Trajet) > 1 :
+		#print('carte[Trajet[0]][0]', carte[Trajet[0]][0] ,  'carte[Trajet[1]][0] ', carte[Trajet[1]][0],  'carte[Trajet[0]][1]', 'carte[Trajet[1]][1]',carte[Trajet[1]][1])
 		D += sqrt((carte[Trajet[0]][0]-carte[Trajet[1]][0])**2+(carte[Trajet[0]][1]-carte[Trajet[1]][1])**2 )
 		Trajet.pop(0)
 	return D	
-macarte = (cities(3,3))
-print(macarte)
-T1= [0,2,1]
-print(distance(T1, macarte))
+def random_journey (journey):
+	
+	i =  np.random.randint(len(journey))
+	j = np.random.randint(len(journey))
+	old_journay_i = journey[i]
+	journey[i]=journey[j]
+	journey[j] = old_journay_i
+	return journey
+
+
+#macarte = (cities(3,3))
+#print(macarte)
+T1= [0,2,3,8,1,10]
+#print(distance(T1, macarte))
+print(random_journey(T1))
 
