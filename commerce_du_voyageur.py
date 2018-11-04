@@ -53,12 +53,12 @@ def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m ):
 		S = 0
 		for i in range(m):
 			jc= random_journey(j[-1])
-			S+= distance(jc) - distance(j[-1])
+			S+= distance(jc,country) - distance(j[-1],country)
 		
 
 		DE = 1/m * S
 		jj = random_journey(j[-1])
-		dd = distance(jj)
+		dd = distance(jj,country)
 		if dd < d[-1]:
 			j.append(jj)
 			d.append(dd)
@@ -76,23 +76,23 @@ def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m ):
 
 
 
-def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, A_rate_max, m ):
+def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m ):
 	j = [journey0]
 	d = [distance(journey0, country)]
 	t=t0
 	T = 1/t0
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
-	while t < tmax  and A_rate > A_rate_max : # rmq nb max iter implique une condition sur la fct de cout
+	while t < tmax   : # rmq nb max iter implique une condition sur la fct de cout
 		## palier
 		S = 0
 		for i in range(m):
 			jc= random_journey(j[-1])
-			S+= distance(jc) - distance(j[-1])
+			S+= distance(jc,country) - distance(j[-1],country)
 		
 
 		DE = 1/m * S
 		jj = random_journey(j[-1])
-		dd = distance(jj)
+		dd = distance(jj,country)
 		if dd < d[-1]:
 			j.append(jj)
 			d.append(dd)
@@ -101,33 +101,35 @@ def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, A_rate_max, m
 				j.append(jj)
 				d.append(dd)
 
-		display(j[-1], country)
+		sort_country = np.zeros((np.shape(country)[0], np.shape(country)[1]))
+		for i,k in zip(j[-1], range(len(country))):
+			sort_country[k,] = country[i,]
+		print('coucou',sort_country)	
+		plt.plot(sort_country[:,0],sort_country[:,1],'-o')
+		plt.pause(0.1)
 		t+=1 	# Pas de convergence	
 		T  = 1 / t 		
-		A_rate = len(x)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
-	
+		
+	plt.draw() 	
 	return  j,d,t		
 
-def display(journey , country):
-	sort_country = np.zeros((np.shape(country)[0], np.shape(country)[1]))
-	for i,j in zip(journey, range(len(country))):
-		sort_country[j,] = country[i,]
 
-	plt.plot(sort_country[:,0],sort_country[:,1],'-o')
-	plt.show()		
+	
+	
 
 
 macarte = (cities(3,10))
 print(macarte)
 T1= [0,3,4,6,1,2,9,7,8,5]
 #print(distance(T1, macarte))
-display(T1, macarte)
+#display(T1, macarte)
 
 
 
 
-S = recuit_traveller_display (macarte, T1, 1,10, 0.5 ,10000, 1*10**5, 5 )
-print(S)
+#S = recuit_traveller_display (macarte, T1, 1,10, 0.5 ,10000, 1*10**5, 5 )
+#print(S)
+recuit_traveller_display (macarte, T1, 1,10, 0.5 ,10000, 5 )
 #fig = plt.figure(1)
 #plt.plot(macarte[:,0],macarte[:,1],'-o')
 # plt.xlabel('x')
