@@ -29,9 +29,10 @@ def g (x,y):
 	return x**4 -x**3 -20*x**2 + x +1 + y**4 -y**3 -20*y**2 + y +1
 
 
-def recuit_f1 (xd ,xp, t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temperature
-	
-	x0 =random.uniform( xd, xp )
+def recuit_f1 ( x0,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temperature
+	#xd ,xp,
+	x=[x0]
+	#x0 =random.uniform( xd, xp )
 	x=[x0]
 	f=[f_1(x0)]
 	t=t0
@@ -56,22 +57,27 @@ def recuit_f1 (xd ,xp, t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temp
 	
 	return  x,f,t	
 
-def recuit_f1_p (x0, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temperature
+def recuit_f1_p (xp, xd, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temperature
+	x0 =random.uniform( xd, xp )
+	#
 	x=[x0]
+	#print('x0 ', x0)
 	f=[f_1(x0)]
 	t=t0
 	T = 1/t0
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
 	
-	while t < tmax  and A_rate > A_rate_max : # rmq nb max iter implique une condition sur la fct de cout
+	while t < tmax  : # rmq nb max iter implique une condition sur la fct de cout #and A_rate > A_rate_max 
 		## palier
 		S = 0
 		for i in range(m):
 			xc= x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1)
+			#print('xc', xc, 'f_1(xc)', f_1(xc) ,'f_1(x[-1])', f_1(x[-1]) )
 			S+= f_1(xc) - f_1(x[-1])
-		
+			#print('S', S )
 
 		DE = 1/m * S
+		#print('DE', DE)
 		xx = x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )	
 		ff = f_1(xx)
 		if ff < f[-1]:
@@ -81,10 +87,11 @@ def recuit_f1_p (x0, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temp
 			if random.uniform(0,1) < kp * exp( -DE / (1000*T)):
 				x.append(xx)
 				f.append(ff)
+
 				
 		t+=1 	# Pas de convergence	
 		T  = 1 / t 		
-		A_rate = len(x)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
+		#A_rate = len(x)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
 	
 	return  x,f,t		
 
@@ -535,33 +542,45 @@ if Which_question==4:
 
 if Which_question==5:
 
-	S = recuit_f1_p ( -5, 1, 10, 0.5 , 10000, 0.0001 , 5)
-	S1 = recuit_f1( -5, 1, 10, 0.5 , 10000, 0.0001 )
+	S = recuit_f1_p ( -5,5, 1, 10, 0.5 , 10000, 0.0001 , 5)
+	#S1 = recuit_f1( -5,1, 10, 0.5 , 10000, 0.0001 )
 	X = np.arange(-6,6,0.1)
 	fig = plt.figure(0)
-	plt.plot(S[0][-1], S[1][-1] , 'k-x')
-	plt.plot(S1[0][-1], S1[1][-1] , 'c-x')
+	plt.plot(S[0], S[1] , 'k-x')
+	#plt.plot(S1[0][-1], S1[1][-1] , 'c-x')
 	plt.plot(X, f_1(X),  c='red')
 	plt.xlabel('x')
 	plt.ylabel('f(x)')	
 	
 	print(S[1][-1])
-	print(S1[1][-1])
+	
 
-	k=[15,1,10,10]
-	kp=[0.5,0.5,0.8,0.1]
-	for i in range(len(k)):
-		S= recuit_f1 ( 0.5, 1,k[i], kp[i] , 10000, 0.0001 )
-		S1= recuit_f1_p ( 0.5, 1,k[i], kp[i] , 10000, 0.0001 ,5)
-		strS = 'x0 = 0.5 ; t0 = 1 ; k = (%f); kp = (%f) ; tmax =  10000'  % (k[i] ,kp[i] )
-		print('len S', len(S[0]), 'lenS1', len(S1[0]))
-		fig = plt.figure(i+1)
-		plt.plot(S[0][-1], S[1][-1] , 'k-x')
-		plt.plot(S1[0][-1], S1[1][-1] , 'c-x')
-		plt.plot(X, f_1(X),  c='red')	
-		plt.xlabel('x')
-		plt.title(strS)
-		plt.ylabel('f(x)')	
+	# k=[15,1,10,10]
+	# kp=[0.5,0.5,0.8,0.1]
+	# for i in range(len(k)):
+	# 	#S= recuit_f1 ( 0.5, 1,k[i], kp[i] , 10000, 0.0001 )
+	# 	S1= recuit_f1_p ( 0.5, 1,k[i], kp[i] , 10000, 0.0001 ,5)
+	# 	strS = 'x0 = 0.5 ; t0 = 1 ; k = (%f); kp = (%f) ; tmax =  10000'  % (k[i] ,kp[i] )
+	# 	print('len S', len(S[0]), 'lenS1', len(S1[0]))
+	# 	fig = plt.figure(i+1)
+	# 	#plt.plot(S[0], S[1], 'k-x')
+	# 	plt.plot(S1[0], S1[1], 'c-x')
+	# 	plt.plot(X, f_1(X),  c='red')	
+	# 	plt.xlabel('x')
+	# 	plt.title(strS)
+	# 	plt.ylabel('f(x)')	
+	
+	# plt.show()
+
+	# for i in range(5):
+	# 	S = recuit_f1_p ( -5, 5,1, 10, 0.5 , 10000, 0.0001 , 5)
+	# 	fig = plt.figure(i+1)
+	# 	#plt.plot(S[0], S[1], 'k-x')
+	# 	plt.plot(S1[0], S1[1], 'c-x')
+	# 	plt.plot(X, f_1(X),  c='red')	
+	# 	plt.xlabel('x')
+	# 	#plt.title(strS)
+	# 	plt.ylabel('f(x)')	
 	
 	plt.show()
 
