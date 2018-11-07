@@ -46,7 +46,7 @@ def recuit_f1 (xd ,xp, t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temp
 			x.append(xx)
 			f.append(ff)
 		else :
-			if random.random() < kp * exp( -1 / (1000*T)):
+			if random.uniform(0,1) < kp * exp( -1 / (1000*T)):
 				x.append(xx)
 				f.append(ff)
 				
@@ -78,7 +78,7 @@ def recuit_f1_p (x0, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temp
 			x.append(xx)
 			f.append(ff)
 		else :
-			if random.random() < kp * exp( -DE / (1000*T)):
+			if random.uniform(0,1) < kp * exp( -DE / (1000*T)):
 				x.append(xx)
 				f.append(ff)
 				
@@ -109,7 +109,7 @@ def recuit_g (xd,xp, yd,yp, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=
 			y.append(yy)
 			f.append(ff)
 		else :
-			if random.random() < kp * exp( -1 / (1000*T)):
+			if random.uniform(0,1) < kp * exp( -1 / (1000*T)):
 				x.append(xx)
 				y.append(yy)
 				f.append(ff)
@@ -145,7 +145,7 @@ def recuit_g_p (x0, y0,t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Te
 			y.append(yy)
 			f.append(ff)
 		else :
-			if random.random() < kp * exp( -DE / (1000*T)):
+			if random.uniform(0,1) < kp * exp( -DE / (1000*T)):
 				x.append(xx)
 				y.append(yy)
 				f.append(ff)

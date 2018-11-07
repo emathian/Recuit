@@ -106,6 +106,7 @@ def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m ):
 			sort_country[k,] = country[i,]
 		print('coucou',sort_country)	
 		plt.plot(sort_country[:,0],sort_country[:,1],'-o')
+		#plt.cla()
 		plt.pause(0.1)
 		t+=1 	# Pas de convergence	
 		T  = 1 / t 		
