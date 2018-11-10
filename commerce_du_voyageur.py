@@ -35,29 +35,31 @@ def distance (Trajet, carte):
 	return D	
 def random_journey (journey):
 	# Faire une copie de journey
+	journeyc =journey
 	i =  np.random.randint(len(journey))
 	j = np.random.randint(len(journey))
 	old_journay_i = journey[i]
-	journey[i]=journey[j]
-	journey[j] = old_journay_i
+	journeyc[i]=journeyc[j]
+	journeyc[j] = old_journay_i
 	return journey
 
-def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m ):
+def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m, cooling ):
 	j = [journey0]
 	d = [distance(journey0, country)]
-	t=t0
-	T = 1/t0
+	Time=[t0]
+	Temp = [1/t0]
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
 	while t < tmax  : # rmq nb max iter implique une condition sur la fct de cout #and A_rate > A_rate_max 
 		## palier
 		S = 0
 		for i in range(m):
 			jc= random_journey(j[-1])
-			S+= distance(jc,country) - distance(j[-1],country)
+			S+= distance(jc,country)- distance(j[-1],country)
 		
 
 		DE = 1/m * S
 		jj = random_journey(j[-1])
+		print(jj)
 		dd = distance(jj,country)
 		if dd < d[-1]:
 			j.append(jj)
@@ -68,55 +70,102 @@ def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m ):
 				d.append(dd)
 		
 
-		t+=1 	# Pas de convergence	
-		T  = 1 / t 		
+		t+=1 	# Pas de convergence
+		Time.append(t)
+		if cooling == 'inv':
+			T  = 1 / t 	
+		elif cooling == 'inv_cube':
+			T = 1/ t**3
+		elif cooling == 'inv_log' :
+			T = 1/log(t)	
+		Temp.append(T)	
 		#A_rate = len(jj)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
 		
-	return  j,d,t		
+	return  j,d,t,T		
 
 
 
-def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m ):
+def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m , cooling):
 	# np.copy 
 	j = [journey0]
+
 	d = [distance(journey0, country)]
+
+
 	t=t0
 	T = 1/t0
+
+	sort_country = np.zeros((np.shape(country)[0], np.shape(country)[1]))
+	for i,k in zip(j[-1], range(len(country))):
+		sort_country[k,] = country[i,]
+				
+	fig = plt.figure()
+	plt.plot(sort_country[:,0],sort_country[:,1],'-o')
+	strS = 't = (%d) ; d =(%f)'  % (t, d[-1] )
+	plt.title( strS )
+	Title= 'voyage %d' % 0
+	fig.savefig(Title) 
+	
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
-	while t < tmax   : # rmq nb max iter implique une condition sur la fct de cout
+	while t <= tmax   : # rmq nb max iter implique une condition sur la fct de cout
 		## palier
 		S = 0
 		for i in range(m):
-			jc= random_journey(j[-1])
+
+			jc= random_journey(np.copy(j[-1]))
+
 			S+= distance(jc,country) - distance(j[-1],country)
-		
+			#print('i', i, 'jc',jc ,'j[-1]',j[-1],'S', S)
+		#print('S loop', S)
 
 		DE = 1/m * S
-		jj = random_journey(j[-1])
+		jj = random_journey(np.copy(j[-1]))
 		dd = distance(jj,country)
 		if dd < d[-1]:
 			j.append(jj)
 			d.append(dd)
+
 		else :
 			if random.uniform(0,1) < kp * exp( -DE / (1000*T)):
 				j.append(jj)
 				d.append(dd)
+			
 
 		sort_country = np.zeros((np.shape(country)[0], np.shape(country)[1]))
-		if t% 200 == 0: 
+		if t% 200 == 0 : 
 			for i,k in zip(j[-1], range(len(country))):
 				sort_country[k,] = country[i,]
 				
 			fig = plt.figure()
 			plt.plot(sort_country[:,0],sort_country[:,1],'-o')
-			strS = 't = (%f) ; d =(%d)'  % (t, d[-1] )
+			strS = 't = (%d) ; d =(%f)'  % (t, d[-1] )
 			plt.title( strS )
+
 			plt.pause(0.3)
 
+			if t%400 ==0  :
+				Title= 'voyage %d' % t
+				fig.savefig(Title) 
 		t+=1 	# Pas de convergence	
-		T  = 1 / t 		
+		if cooling == 'inv':
+			T  = 1 / t 	
+		elif cooling == 'inv_cube':
+			T = 1/ t**3
+		elif cooling == 'inv_log' :
+			T = 1/log(t)			
 	plt.ioff()   	
-	plt.draw() 	
+	plt.draw() 
+	print('len j',len(j))
+	Ind  = np.arange(len(j))
+
+	fig = plt.figure(t + 1)
+	plt.plot(Ind, d )
+	plt.ylabel('distance')	
+	plt.xlabel('Nb iterations')	
+	plt.xlim(0,tmax)
+	Title= 'distance %d' % 0
+	fig.savefig(Title) 
+		
 	return  j,d,t		
 
 
@@ -126,35 +175,69 @@ def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m ):
 
 macarte = (cities(3,10))
 print(macarte)
-T1= [0,3,4,6,1,2,9,7,8,5]
+T1= np.arange(0,10)
 #print(distance(T1, macarte))
 #display(T1, macarte)
 
 
 
-
-S =recuit_traveller_display (macarte, T1, 1,10, 0.5 ,10000, 5 )
-print(S[0])
-# s = recuit_traveller_display (macarte, T1, 1,10, 0.5 ,10000,  5 ) # a_rate plus d'influence 
-# ind = np.arange(len(s[0]))
-# sort_country = np.zeros((np.shape(macarte)[0], np.shape(macarte)[1]))
-		
-# for i,k in zip(s[0][-1], range(len(macarte))):
-# 	sort_country[k,] = macarte[i,]
-
-# fig = plt.figure(1)
-# plt.plot(sort_country[:,0],sort_country[:,1],'-o')
+s_inv = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,  5 , 'inv')
+s_inv_cube = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,  5 , 'inv_cube')
+s_log = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,  5 , 'inv_log')
 
 
-# fig = plt.figure(2)
-# plt.plot(ind,s[1])
-# plt.show()
+sort_country_inv = np.zeros((np.shape(macarte)[0], np.shape(macarte)[1]))
+	for i,k in zip(s_inv[0], range(len(macarte))):
+				sort_country_inv[k,] = macarte[i,]
 
 
-#fig = plt.figure(1)
-#plt.plot(macarte[:,0],macarte[:,1],'-o')
-# plt.xlabel('x')
-# plt.ylabel('f(x)')	
-#plt.show()	
+sort_country_inv_cube = np.zeros((np.shape(macarte)[0], np.shape(macarte)[1]))
+	for i,k in zip(s_inv_cube[0], range(len(macarte))):
+				sort_country_inv_cube[k,] = macarte[i,]
 
-print(random_journey(T1))
+
+sort_country_log = np.zeros((np.shape(macarte)[0], np.shape(macarte)[1]))
+	for i,k in zip(s_log[0], range(len(macarte))):
+				sort_country_log[k,] = macarte[i,]
+
+
+plt.figure()
+plt.subplot(331)
+plt.plot(sort_country_inv[:,0],sort_country_inv[:,1],'-o')
+strS = 'T = (%f) ; d =(%f)'  % (s_inv[2], s_inv[1][-1])
+plt.title( strS )
+
+plt.subplot(332)
+plt.plot(sort_country_inv_cube[:,0],sort_country_inv_cube[:,1],'-o')
+strS = 'T = (%f) ; d =(%f)'  % (s_inv_cube[2], s_inv_cube[1][-1])
+plt.title( strS )
+
+plt.subplot(333)
+plt.plot(sort_country_log[:,0],sort_country_log[:,1],'-o')
+strS = 'T = (%f) ; d =(%f)'  % (s_log[2], s_log[1][-1])
+plt.title( strS )
+
+
+plt.subplot(334)
+plt.plot(s_inv[1],s_inv[2],'-o')
+
+plt.subplot(335)
+plt.plot(s_inv_cube[1],s_inv_cube[2],'-o')
+
+plt.subplot(336)
+plt.plot(s_log[1],s_log[2],'-o')
+
+X = np.arange(0,10001)
+T_inv = 1/X
+T_inv_cube =1 / X**3
+T_log = 1 / log(X)
+
+plt.subplot(337)
+plt.plot(X,T_inv,'-o')
+
+plt.subplot(335)
+plt.plot(X,T_inv_cube,'-o')
+
+plt.subplot(336)
+plt.plot(X,T_log,'-o')
+

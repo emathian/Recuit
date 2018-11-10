@@ -29,10 +29,10 @@ def g (x,y):
 	return x**4 -x**3 -20*x**2 + x +1 + y**4 -y**3 -20*y**2 + y +1
 
 
-def recuit_f1 ( x0,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temperature
+def recuit_f1 ( xd,xp,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temperature
 	#xd ,xp,
-	x=[x0]
-	#x0 =random.uniform( xd, xp )
+	#x=[x0]
+	x0 =random.uniform( xd, xp )
 	x=[x0]
 	f=[f_1(x0)]
 	t=t0
@@ -182,16 +182,19 @@ def stat(vp , F , n_rep , f , param , k_default, kp_default , tmax_default, sup_
 				S = recuit_f1 ( -5, 5, 1, k_default , vp[j] , tmax_default, 0.0001 )
 				E[i][j] = (abs(S[1][-1] -F))	
 			elif f=='g' and param=='k':
+				#print('ok')
 				S = recuit_g ( -3, 3, -3,3,1, vp[j], kp_default , tmax_default, 0.0001 )
 				E[i][j] = (abs(S[2][-1] -F))
+				#print(E[i][j])
 			elif f=='g' and param=='kp':
 				S = recuit_g ( -3, 3, -3,3,1, k_default, vp[j] , tmax_default, 0.0001 )
 				E[i][j] = (abs(S[2][-1] -F))		
 			else :
 				return ('unknown function')
 		
+	print(int(lvp/2))
+	n_col_score = int(lvp/2)
 	
-	n_col_score = lvp//2
 	Score_inf = np.zeros((n_rep, n_col_score))
 	for i in  range(n_rep):	
 		for j in range(n_col_score):	
@@ -203,9 +206,9 @@ def stat(vp , F , n_rep , f , param , k_default, kp_default , tmax_default, sup_
 		for j in range(n_col_score):	
 			if E[i][j+n_col_score] <2 and E[i][j+n_col_score]>-2 :
 				Score_sup[i][j]=1
-
-	Sum_score_inf = np.sum(Score_inf,axis=1)
-	Sum_score_sup = np.sum(Score_sup,axis=1)
+	print('Score inf shape', np.shape(Score_inf))
+	Sum_score_inf = np.sum(Score_inf,axis=0)
+	Sum_score_sup = np.sum(Score_sup,axis=0)
 	# ## T test unilateral 
 	# ## H0  : S_k>20 > S_k<20
 	mInf = s.mean(Sum_score_inf)
@@ -223,7 +226,9 @@ def stat(vp , F , n_rep , f , param , k_default, kp_default , tmax_default, sup_
 	pvB =2*( 1-(t.cdf(abs(T_test),len(Sum_score_inf) +len(Sum_score_sup) -2)) )
 	pvU =  1-(t.cdf(T_test,len(Sum_score_inf) +len(Sum_score_sup) -2)) 
 
-	print('Vecteur du nombre de succes sur n repetition partie inferieure : ', Sum_score_inf ,'\n',
+	print('Return Score inf' , Score_inf,
+		'Return Score inf' , Score_sup,
+		'Vecteur du nombre de succes sur n repetition partie inferieure : ', Sum_score_inf ,'\n',
 		'Vecteur du nombre de succes sur n repetition partie superieure : ', Sum_score_sup ,'\n',
 		'Moyenne de succes partie inferieure : ', mInf ,'\n',
 		'Moyenne de succes partie superieur : ', mSup ,'\n',
@@ -315,12 +320,12 @@ if Which_question==2:
 	# print(S[0][-1], S[1][-1])
 	
 
-	print('k = np.arange(0,15,0.5)')
-	print('F est le min global')
-	k = np.arange(0,15,0.5)
+	#print('k = np.arange(0,15,0.5)')
+	#print('F est le min global')
+	k = np.arange(0,30,0.5)
 	#kp = np.arange(0,1,0.02)
 
-	print(stat( k, F  , 40,'f', 'k' , 10 , 0.5, 10000 ,0 ) )
+	print(stat( k, F  , 40,'g', 'k' , 10 , 0.5, 10000 ,0 ) )
 	#print( stat(kp, F  ,40, 'f','kp' , 10 , 0.5, 10000 , 1))
 
 if Which_question==3:
@@ -343,38 +348,47 @@ if Which_question==4:
 	Y = np.arange(-5,5,0.2)
 	X, Y = np.meshgrid(X, Y)
 	S = recuit_g ( -1, 1, -1,1 ,1,  15, 0.01 , 20000, 0.0001 )
+	# print(S)
 	Z= g(X,Y)
 	M1 = g(3.548, 3.548)
 	M2 = g(3.548, -2.823)
 	M3 = g(-2.823,3.548)
 	M4 = g(-2.823,-2.823)
 	F= Z.min()
-	print(F)
-	
+	# print(F)
+	# print(M1 , M2 , M3 , M4)
 
 
 	#S = recuit_g (0, 0, 1, 1, 0.001 ,  10000 , 0.0001 )
-	fig = plt.figure(0) #opens a figure environment
-	ax = fig.gca(projection='3d') #to perform a 3D plot
-	#ax.scatter(3.548,3.548,M1, '-o',c='red', s=200,label='(x,y,z)=(3.548,3.548, %d)' %M1)
-	#ax.scatter(3.548,-2.823,M2,'-o' ,c='pink', s=200,label='(x,y,z)=(3.548,-2.823, %d)' %M2)
-	#ax.scatter(-2.823,3.548,M3,'-o' ,c='orange', s=200,label='(x,y,z)=(-2.823,3.548, %d)' %M3)
-	#ax.scatter(-2.823,-2.823,M4,'-o' ,c='yellow', s=200,label='(x,y,z)=(-2.823,-2.823, %d)' %M4)
-	ax.scatter(S[0][-1], S[1][-1],S[2][-1], '-o' ,c='green', s=200,label='(x,y,z)=(-2.823,-2.823, %d)' %M4)
-	surf = ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5) #plot definition and options
+	# fig = plt.figure() #opens a figure environment
+	# ax = fig.gca(projection='3d') #to perform a 3D plot
+	# ax.scatter(3.548,3.548,M1, '-o',c='red', s=200,label='(x,y,z)=(3.548,3.548, %d)' %M1)
+	# ax.scatter(3.548,-2.823,M2,'-o' ,c='pink', s=200,label='(x,y,z)=(3.548,-2.823, %d)' %M2)
+	# ax.scatter(-2.823,3.548,M3,'-o' ,c='orange', s=200,label='(x,y,z)=(-2.823,3.548, %d)' %M3)
+	# ax.scatter(-2.823,-2.823,M4,'-o' ,c='yellow', s=200,label='(x,y,z)=(-2.823,-2.823, %d)' %M4)
+	# ax.scatter(S[0][-1], S[1][-1],S[2][-1], '-o' ,c='green', s=200,label='(x,y,z)=(-2.823,-2.823, %d)' %M4)
+	# surf = ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5) #plot definition and options
 	
-	ax.plot(S[0],S[1],S[2] ,c='yellow')
-	plt.legend()
-	ax.set_xlabel('x')
-	ax.set_ylabel('y')
-	ax.set_zlabel('z')
-	
-	# k = np.arange(0,15,0.5) 
-	# kp = np.arange(0,1,0.02)
+	# ax.plot(S[0],S[1],S[2] ,c='yellow')
+	# plt.legend()
+	# ax.set_xlabel('x')
+	# ax.set_ylabel('y')
+	# ax.set_zlabel('z')
+	# plt.show()
+
+	S = recuit_f1 ( -6, 6, 1,10, 0.5 , 10000, 0.0001 )
+	X = np.arange(-6,6,0.1)
+	F = min(f_1(X))
+
+
+	k = np.arange(0,30,0.5) 
+	kp = np.arange(0.5,1,0.02)
 	# print('kp = np.arange(0,1,0.02)')
 
-	# print(stat( k, F  , 40,'g', 'k' , 10 , 0.5, 10000 ,0 ) )
-	# print( stat(kp, F  ,40, 'g','kp' , 10 , 0.5, 10000 , 1))
+	########## print(stat( k, F  , 14,'g', 'k' , 10 , 0.5, 10000 ,0 ) )
+	
+
+	print( stat(k, F  ,40, 'f','k' , 10 , 0.5, 10000 , 1))
 
 
 
@@ -582,7 +596,7 @@ if Which_question==5:
 	# 	#plt.title(strS)
 	# 	plt.ylabel('f(x)')	
 	
-	plt.show()
+
 
 
 if Which_question==6:
