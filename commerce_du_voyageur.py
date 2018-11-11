@@ -45,11 +45,15 @@ def random_journey (journey):
 
 def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m, cooling ):
 	j = [journey0]
-	jall = [journey0]
+	
 	d = [distance(journey0, country)]
-	dall = [distance(journey0, country)]
-	Time=[t0]
-	t = Time[-1]
+
+
+	t = t0
+
+
+	#tt_accepted = t0
+	#t_accepted=[tt_accepted]
 	Temp = [1/t0]
 	T =Temp[-1]
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
@@ -68,31 +72,32 @@ def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m, cooling
 		if dd < d[-1]:
 			j.append(jj)
 			d.append(dd)
-			jall.append(jj)
-			dall.append(dd)
+			TR  = 1 / t 	
+			#tt_accepted += 1
+			#t_accepted.append(tt_accepted)
+			
 		else :
 			if random.random() < kp * exp( -DE / (1000*T)):
 				j.append(jj)
 				d.append(dd)
-				jall.append(jj)
-				dall.append(dd)
-			else :
-				jall.append(jj)	
-				dall.append(dd)
-		
+				#tt_accepted += 1
+				#t_accepted.append(tt_accepted)
+
 
 		t+=1 	# Pas de convergence
-		Time.append(t)
+
 		if cooling == 'inv':
 			T  = 1 / t 	
 		elif cooling == 'inv_cube':
 			T = 1/ t**3
 		elif cooling == 'inv_log' :
 			T = 1/log(t)	
-		Temp.append(T)	
-		#A_rate = len(jj)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
+
 		
-	return  j,d,Time,Temp, jall , dall		
+		#A_rate = len(jj)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
+		#t_accepted.append(10000)
+		#d.append(d[-1])
+	return  j,d,Temp
 
 
 
@@ -192,10 +197,10 @@ T1= np.arange(0,10)
 
 
 
-s_inv = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,0.0001,  5 , 'inv')
+s_inv = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,0.000001,  5 , 'inv')
 #print(s_inv[0])
-s_inv_cube = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,0.0001,   5 , 'inv_cube')
-s_log = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,0.0001,   5 , 'inv_log')
+s_inv_cube = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,0.000001,   5 , 'inv_cube')
+s_log = recuit_traveller(macarte, T1, 1,10, 0.5 ,10000,0.000001,   5 , 'inv_log')
 
 
 sort_country_inv = np.zeros((np.shape(macarte)[0], np.shape(macarte)[1]))
@@ -212,49 +217,65 @@ sort_country_log = np.zeros((np.shape(macarte)[0], np.shape(macarte)[1]))
 for i,k in zip(s_log[0][-1], range(len(macarte))):
 	sort_country_log[k,] = macarte[i,]
 
+s_inv_min = min(s_inv[1])
+s_inv_cube_min = min(s_inv_cube[1])
+s_log_min = min(s_log[1])
+
 
 plt.figure()
 plt.subplot(331)
-plt.plot(sort_country_inv[:,0],sort_country_inv[:,1],'-o')
+plt.plot(sort_country_inv[:,0],sort_country_inv[:,1],'-', c='navy')
 strS = 'T = (%f) ; d =(%f)'  % (s_inv[2][-1], s_inv[1][-1])
 plt.title( strS )
 
 plt.subplot(332)
-plt.plot(sort_country_inv_cube[:,0],sort_country_inv_cube[:,1],'-o')
+plt.plot(sort_country_inv_cube[:,0],sort_country_inv_cube[:,1],'-', c='royalblue')
 strS = 'T = (%f) ; d =(%f)'  % (s_inv_cube[2][-1], s_inv_cube[1][-1])
 plt.title( strS )
 
 plt.subplot(333)
-plt.plot(sort_country_log[:,0],sort_country_log[:,1],'-o')
+plt.plot(sort_country_log[:,0],sort_country_log[:,1],'-', c= 'deepskyblue')
 strS = 'T = (%f) ; d =(%f)'  % (s_log[2][-1], s_log[1][-1])
 plt.title( strS )
 
 
+Ind_inv  = np.arange(len(s_inv[0]))
+Ind_inv_cube  = np.arange(len(s_inv_cube[0]))
+Ind_log = np.arange(len(s_log[0]))
+
 plt.subplot(334)
-plt.plot(s_inv[2],s_inv[5],'-o')
+plt.plot(Ind_inv,s_inv[1],'-',c='navy')
+plt.axhline(y=s_inv_min, color='r', linestyle='-')
 
 plt.subplot(335)
-plt.plot(s_inv_cube[2],s_inv_cube[5],'-o')
+plt.plot(Ind_inv_cube,s_inv_cube[1],'-',c='royalblue')
+plt.axhline(y=s_inv_cube_min, color='r', linestyle='-')
+#plt.xlim((0,10000))
 
 plt.subplot(336)
-plt.plot(s_log[2],s_log[5],'-o')
+plt.plot(Ind_log,s_log[1],'-', c= 'deepskyblue')
+plt.axhline(y=s_log_min, color='r', linestyle='-')
 
-X = np.arange(0,10001)
+X = np.arange(1,10001)
 T_inv = 1/X
 T_inv_cube =1 / X**3
 T_log = 1 / np.log(X)
 
 plt.subplot(337)
-plt.plot(X,T_inv,'-o')
+plt.plot(X,np.log(T_inv),'-',c='navy')
+plt.xlabel("Nb itération")
+plt.xlabel("log(1/t)")
 
 plt.subplot(338)
-plt.plot(X,T_inv_cube,'-o')
+plt.plot(X,np.log(T_inv_cube),'-',c='royalblue')
+plt.xlabel("Nb itération")
+plt.xlabel("log(1/t^3)")
 
 plt.subplot(339)
-plt.plot(X,T_log,'-o')
+plt.plot(X,np.log(T_log),'-', c= 'deepskyblue')
+plt.xlabel("Nb itération")
+plt.xlabel("log(1/log(t))")
 
 plt.show()
-
-
 
 
