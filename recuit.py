@@ -659,7 +659,7 @@ if Which_question==7:
 
 	plt.show()	
 
-if Which_question==78 :
+if Which_question==8 :
 	X= np.arange(-6,6)
 	F = min(f_1 (X))
 	dist_max_sp =[]
@@ -679,7 +679,7 @@ if Which_question==78 :
 			Succes_ap.append(1)
 
 	print('distance max sans paliers', dist_max_sp)		
-	print('distance max avec paliers', dist_max_sp)	
+	print('distance max avec paliers', dist_max_ap)	
 	print('nombre de succes sans paliers', Succes_sp)
 	print('nombre de succe7s avec paliers', Succes_ap)
 
