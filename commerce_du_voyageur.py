@@ -57,12 +57,12 @@ def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m, cooling
 		## palier
 		S = 0
 		for i in range(m):
-			jc= random_journey(j[-1])
+			jc= random_journey(np.copy(j[-1]))
 			S+= distance(jc,country)- distance(j[-1],country)
 		
 
 		DE = 1/m * S
-		jj = random_journey(j[-1])
+		jj = random_journey(np.copy(j[-1]))
 		#print(jj)
 		dd = distance(jj,country)
 		if dd < d[-1]:
