@@ -32,7 +32,9 @@ def g (x,y):
 def recuit_f1 ( xd,xp,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Temperature
 	#xd ,xp,
 	#x=[x0]
+
 	x0 =random.uniform( xd, xp )
+	print(x0)
 	x=[x0]
 	f=[f_1(x0)]
 	t=t0
@@ -59,6 +61,7 @@ def recuit_f1 ( xd,xp,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Tempe
 
 def recuit_f1_p (xp, xd, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temperature
 	x0 =random.uniform( xd, xp )
+
 	#
 	x=[x0]
 	#print('x0 ', x0)
@@ -127,7 +130,10 @@ def recuit_g (xd,xp, yd,yp, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=
 	
 	return  x,y,f,t		
 
-def recuit_g_p (x0, y0,t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temperature
+def recuit_g_p (xd, xp , yd ,yp,t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temperature
+	x0 = random.uniform( xd, xp )
+	y0= random.uniform( yd, yp )
+
 	x=[x0]
 	y=[y0]
 	f=[g(x0,y0)]
@@ -347,7 +353,7 @@ if Which_question==4:
 	X = np.arange(-5,5,0.2)
 	Y = np.arange(-5,5,0.2)
 	X, Y = np.meshgrid(X, Y)
-	S = recuit_g ( -1, 1, -1,1 ,1,  15, 0.01 , 20000, 0.0001 )
+	
 	# print(S)
 	Z= g(X,Y)
 	M1 = g(3.548, 3.548)
@@ -357,8 +363,12 @@ if Which_question==4:
 	F= Z.min()
 	# print(F)
 	# print(M1 , M2 , M3 , M4)
-
-
+	succes = 0
+	for i in range (40):
+		S = recuit_g ( -1, 1, -1,1 ,1,  15, 0.1 , 20000, 0.0001 )
+		if abs(S[2][-1] - F) < 2 :
+			succes += 1
+	print('NOmbre de succes ' , succes)		
 	#S = recuit_g (0, 0, 1, 1, 0.001 ,  10000 , 0.0001 )
 	# fig = plt.figure() #opens a figure environment
 	# ax = fig.gca(projection='3d') #to perform a 3D plot
@@ -376,19 +386,16 @@ if Which_question==4:
 	# ax.set_zlabel('z')
 	# plt.show()
 
-	S = recuit_f1 ( -6, 6, 1,10, 0.5 , 10000, 0.0001 )
-	X = np.arange(-6,6,0.1)
-	F = min(f_1(X))
 
 
-	k = np.arange(0,30,0.5) 
-	kp = np.arange(0.5,1,0.02)
+	##k = np.arange(0,30,0.5) 
+	##kp = np.arange(0.5,1,0.02)
 	# print('kp = np.arange(0,1,0.02)')
 
 	########## print(stat( k, F  , 14,'g', 'k' , 10 , 0.5, 10000 ,0 ) )
 	
 
-	print( stat(k, F  ,40, 'f','k' , 10 , 0.5, 10000 , 1))
+	##print( stat(k, F  ,40, 'f','k' , 10 , 0.5, 10000 , 1))
 
 
 
@@ -606,14 +613,18 @@ if Which_question==6:
 	Z= g(X,Y)
 
 
-	S = recuit_g_p ( 0,0, 1, 10, 0.5 , 10000, 0.0001 , 5)
-	S1 = recuit_g( 0,0, 1, 10, 0.5 , 10000, 0.0001 )
+	S = recuit_g_p ( 0,0,0,0, 1, 15, 0.2 , 1000, 0.0001 , 5)
+	S1 = recuit_g( 0,0,0,0, 1, 15, 0.2 , 1000, 0.0001 )
 
 	fig = plt.figure(0)
 	ax = fig.gca(projection='3d') #to perform a 3D plot
 	surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, antialiased=False) #plot definition and options
-	ax.plot(S[0][-1],S[1][-1],S[2][-1], '-o', c='red')
-	ax.plot(S1[0][-1],S1[1][-1],S1[2][-1], '-o',c='cyan')
+	
+	ax.plot(S1[0],S1[1],S1[2], '-o',c='gray')
+	ax.plot(S[0],S[1],S[2], '-o', c='cyan')
+	ax.set_zlim(-300,300)
+	ax.set_xlim(-5,5)
+	ax.set_ylim(-5,5)
 	ax.set_xlabel('x')
 	ax.set_ylabel('y')
 	ax.set_zlabel('z')
@@ -623,3 +634,62 @@ if Which_question==6:
 	print(S1[1][-1])
 
 	plt.show()
+
+
+if Which_question==7:
+	X = np.arange(-5,5,0.2)
+	
+	Y= f_1(X)
+
+
+	S = recuit_f1_p ( 0, 0, 1, 10, 0.5 , 10000, 0.0001 , 5)
+	S1 = recuit_f1( 0, 0 , 1, 10, 0.5 , 10000, 0.0001 )
+
+	fig = plt.figure(0)
+
+	plt.plot(S1[0], S1[1],  '-o',c='gray')
+	plt.plot(S[0], S[1],  '-o', c='cyan')
+	plt.ylim((-200,300))
+	plt.xlim((-5,5))
+	plt.plot(X, f_1(X),  c='black')	
+	
+	
+	print(S[1][-1])
+	print(S1[1][-1])
+
+	plt.show()	
+
+if Which_question==78 :
+	X= np.arange(-6,6)
+	F = min(f_1 (X))
+	dist_max_sp =[]
+	dist_max_ap = []
+	Succes_sp = []
+	Succes_ap = []
+	for i in range(21):
+		dist_sp = recuit_f1(-6, 6, 1,10, 0.5 , 10000, 0.0001 )
+		f =max( abs(dist_sp[1]-  F) )
+		dist_max_sp.append(f)
+		if dist_sp[1][-1]-F<2 :
+			Succes_sp.append(1)
+		dist_ap = recuit_f1_p(-6, 6, 1,10, 0.5 , 10000, 0.0001,5)
+		f2 =max( abs(dist_ap[1]-  F) )
+		dist_max_ap.append(f2)
+		if dist_ap[1][-1]-F<2 : 
+			Succes_ap.append(1)
+
+	print('distance max sans paliers', dist_max_sp)		
+	print('distance max avec paliers', dist_max_sp)	
+	print('nombre de succes sans paliers', Succes_sp)
+	print('nombre de succe7s avec paliers', Succes_ap)
+
+
+
+
+
+
+
+
+
+
+

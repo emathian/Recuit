@@ -1,0 +1,466 @@
+---
+title: "resutlt_opti"
+author: "Emilie Mathias"
+date: "11/11/2018"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    mathjax: local
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(DescTools)
+```
+# Etude des paramètre k et k' pour la fonction F
+
+## étude du nombre de succè pour différents k dans [0,15] 
+```{r eval=TRUE, echo=TRUE}
+c1 = c( 0. ,22. ,32. ,26. ,28. ,25. ,26. ,31. ,28. ,28. ,30. ,24. ,27. ,32. ,28. ,32. ,32. ,28. ,
+ 26. ,31. ,28. ,30. ,27. ,34. ,28. ,25. ,28. ,35. ,26. ,34.)
+
+c2 = c(30. ,28. ,29. ,33. ,25. ,30. ,34. ,32. ,31. ,27. ,33. ,34. ,32. ,33. ,32. ,29. ,28. ,32.,
+ 28. ,27. ,30. ,34. ,32. ,30. ,33. ,29. ,26. ,30. ,30. ,28.)
+
+vk = seq(0.25,14.75 , 0.25)
+T1  = data.frame(val = c(c1,c2),
+                 k = vk,
+                 classe = c(rep('a[0,3.5]', 14),
+                            rep('b(3.5,7.25]', 15),
+                            rep('c(7.25,11]', 15),
+                            rep('d(11,15]', 15))
+)
+boxplot(T1$val~T1$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1$val~T1$classe)
+kruskal.test(T1$val~T1$classe)
+
+NemenyiTest(x = T1$val,
+                g = T1$classe,
+                 dist="tukey")
+
+```
+
+
+## étude du nombre de succès pour différents k' dans [0,1] 
+```{r eval=TRUE, echo=TRUE}
+c3 = c(40. ,38. ,37. ,34. ,38. ,32. ,32. ,28. ,28. ,32. ,30. ,35. ,30. ,32. ,31. ,29. ,24. ,37.,
+       28. ,29. ,34. ,32. ,29. ,28. ,31)
+c4 = c(32. ,27. ,31. ,31. ,29. ,31. ,31. ,31. ,27. ,34. ,34. ,33. ,34. ,26. ,29. ,33. ,30. ,28.,
+        29. ,30. ,33. ,30. ,29. ,28. ,29.)
+
+
+vkp = seq(0, 0.98 , 0.02)
+T2  = data.frame(val = c(c3,c4),
+                 k = vkp,
+                 classe = c(rep('a[0,22]', 12),
+                            rep('b (0.22,0.48]', 13),
+                            rep('c(0.48,0.72]', 12),
+                            rep('d(0.72,1)', 13))
+)
+bartlett.test(T2$val~T2$classe)
+boxplot(T2$val~T2$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+kruskal.test(T2$val~T2$classe)
+NemenyiTest(T2$val, T2$classe, 'tukey')
+wilcox.test(T2$val[T2$classe=='a[0,22]'],T2$val[T2$classe=='b (0.22,0.48]'])
+
+# La classe 1 a de meilleur resultats
+```
+
+# Etude des paramètre k et k' pour la fonction G
+## Etude de l'effet de k [0,15] pour G
+
+```{r eval=TRUE, echo=TRUE}
+ c1 = c(0. ,20. ,25. ,18. ,23. ,28. ,22. ,25. ,22. ,23. ,20. ,16. ,12. ,24. ,25. ,22. ,20. ,22.,
+ 22. ,27. ,30. ,29. ,25. ,24. ,25. ,32. ,19. ,27. ,24. ,23.)
+ c2 =c( 25. ,22. ,29. ,24. ,22. ,23. ,21. ,23. ,29. ,23. ,24. ,23. ,23. ,23. ,17. ,20. ,16. ,25.,
+ 28. ,16. ,22. ,25. ,26. ,25. ,26. ,19. ,16. ,18. ,18. ,21.)
+
+
+c1 = c1[2:30 ]
+shapiro.test(c1)
+shapiro.test(c2)
+boxplot(c1,c2)
+var.test(c1,c2)
+t.test(c1, c2)
+
+vk = seq(0.25,14.75 , 0.25)
+T1  = data.frame(val = c(c1,c2),
+                 k = vk,
+                 classe = c(rep('a[0,3.5]', 14),
+                            rep('b(3.5,7.25]', 15),
+                            rep('c(7.25,11]', 15),
+                            rep('d(11,15]', 15))
+)
+boxplot(T1$val~T1$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1$val~T1$classe)
+kruskal.test(T1$val~T1$classe)
+
+
+```
+## Etude de l'effet de k' [0,1] pour G
+# coinditions initiales aléatoire
+## k and f 40 simulation
+```{r eval=TRUE, echo=TRUE}
+
+c1 = c( 0. ,26. ,26. ,34. ,33. ,32. ,31. ,27. ,31. ,30. ,25. ,30. ,28. ,31. ,28. ,32. ,28. ,32.,
+        32. ,28. ,30. ,30. ,32. ,34. ,29. ,32. ,27. ,28. ,30. ,29.)
+c2 = c(32. ,29. ,29. ,29. ,35. ,35. ,29. ,29. ,27. ,27. ,38. ,31. ,32. ,25. ,31. ,28. ,33. ,31.,
+       35. ,29. ,32. ,27. ,30. ,32. ,33. ,34. ,29. ,30. ,31. ,31.)
+
+
+mean(c(c1,c2))
+c1 = c1[2:30 ]
+shapiro.test(c1)
+shapiro.test(c2)
+boxplot(c1,c2)
+var.test(c1,c2)
+t.test(c1, c2)
+t.test(c1, c2, 'less')
+vk = seq(0.5, 29.5 , 0.5)
+T1  = data.frame(val = c(c1,c2),
+                 k = vk,
+                 classe = c(rep('a[0,7.5]', 14),
+                            rep('b[8,15]', 15),
+                            rep('c[15.5,23]', 15),
+                            rep('d[23,30]', 15))
+)
+boxplot(T1$val~T1$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1$val~T1$classe)
+kruskal.test(T1$val~T1$classe)
+
+
+# On ne peut pas rejeter h0 :(
+```
+##kp and f 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c3 = c(40. ,38. ,37. ,34. ,38. ,32. ,32. ,28. ,28. ,32. ,30. ,35. ,30. ,32. ,31. ,29. ,24. ,37.,
+       28. ,29. ,34. ,32. ,29. ,28. ,31)
+c4 = c(32. ,27. ,31. ,31. ,29. ,31. ,31. ,31. ,27. ,34. ,34. ,33. ,34. ,26. ,29. ,33. ,30. ,28.,
+        29. ,30. ,33. ,30. ,29. ,28. ,29.)
+
+shapiro.test(c3)
+shapiro.test(c4)
+var.test(c3,c4)
+# L'homoscédasticité n'est pas respectée
+boxplot(c3,c4)
+plot(c3)
+plot(c4)
+
+
+vkp = seq(0, 0.98 , 0.02)
+T2  = data.frame(val = c(c3,c4),
+                 k = vkp,
+                 classe = c(rep('a[0,22]', 12),
+                            rep('b (0.22,0.48]', 13),
+                            rep('c(0.48,0.72]', 12),
+                            rep('d(0.72,1)', 13))
+)
+bartlett.test(T2$val~T2$classe)
+boxplot(T2$val~T2$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+kruskal.test(T2$val~T2$classe)
+wilcox.test(T2$val[T2$classe=='a[0,22]'],T2$val[T2$classe=='b (0.22,0.48]'])
+
+# La classe 1 a de meilleur resultats
+```
+## k and g 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c5 = c(0. ,26. ,24. ,21. ,20. ,17. ,20. ,26. ,19. ,24. ,26. ,18. ,23. ,22. ,18. ,23. ,18. ,28.,
+       24. ,25. ,23. ,26. ,27. ,21. ,18. ,27. ,23. ,20. ,23. ,23.)
+c6 = c(19. ,24. ,24. ,23. ,29. ,23. ,22. ,21. ,24. ,25. ,25. ,20. ,23. ,31. ,22. ,25. ,28. ,26.,
+       19. ,23. ,24. ,22. ,20. ,27. ,24. ,24. ,23. ,17. ,23. ,19.)
+
+
+c5 = c5[2:30 ]
+shapiro.test(c5)
+shapiro.test(c6)
+boxplot(c5,c6)
+var.test(c5,c6)
+t.test(c5, c6)
+
+vk = seq(0.5, 29.5 , 0.5)
+T1g  = data.frame(val = c(c5,c6),
+                 k = vk,
+                 classe = c(rep('a[0,7.5]', 14),
+                            rep('b[8,15]', 15),
+                            rep('c[15.5,23]', 15),
+                            rep('d[23,30]', 15))
+)
+boxplot(T1g$val~T1g$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T2$val~T2$classe)
+kruskal.test(T1$val~T1$classe)
+```
+##kp and g 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c7 = c(27. ,22. ,28. ,25. ,29. ,17. ,19. ,27. ,26. ,22. ,24. ,19. ,17. ,26. ,24. ,26. ,25.,
+       31. ,20. ,20. ,18. ,21. ,23. ,18.)
+c8 = c(20. ,22. ,19. ,22. ,22. ,25. ,26. ,20. ,19. ,23. ,21. ,17. ,17. ,21. ,22. ,22. ,15. ,25.,
+       22. ,21. ,23. ,24. ,19. ,24. ,22.)
+
+shapiro.test(c7)
+shapiro.test(c8)
+var.test(c7,c8)
+# L'homoscédasticité n'est pas respectée ni la normalité
+boxplot(c7,c8)
+plot(c7)
+plot(c8)
+
+
+vkp = seq(0.02, 0.98 , 0.02)
+T2g  = data.frame(val = c(c7,c8),
+                 k = vkp,
+                 classe = c(rep('a[0,22]', 11),
+                            rep('b (0.22,0.48]', 13),
+                            rep('c(0.48,0.72]', 12),
+                            rep('d(0.72,1)', 13))
+)
+bartlett.test(T2g$val~T2g$classe) # l'homogénité des variances n'est pas réespectée
+kruskal.test(T2g$val~T2g$classe)
+boxplot(T2g$val~T2g$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+wilcox.test(T2g$val[T2g$classe=='a[0,22]'],T2g$val[T2g$classe=='b (0.22,0.48]'])
+# La classe 1 a de meilleur resultats
+
+```
+
+
+# Condition initiales fixées à 0
+## k and f 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c1f  = c( 0. ,27. ,24. ,26. ,24. ,32. ,32. ,34. ,28. ,31. ,32. ,29. ,23. ,28. ,32. ,34. ,30. ,30.,
+          34. ,33. ,33. ,30. ,29. ,28. ,27. ,29. ,32. ,32. ,30. ,30.)
+c2f = c(28. ,26. ,25. ,29. ,33. ,33. ,26. ,31. ,33. ,33. ,28. ,29. ,27. ,31. ,28. ,35. ,32. ,33.,
+        31. ,29. ,31. ,29. ,31. ,30. ,33. ,33. ,32. ,29. ,30. ,30.)
+
+
+c1f = c1f[2:30 ]
+shapiro.test(c1f)
+shapiro.test(c2f)
+boxplot(c1f,c2f)
+var.test(c1f,c2f)
+t.test(c1f, c2f)
+t.test(c1f, c2f, 'less')
+vk = seq(0.5, 29.5 , 0.5)
+T1F  = data.frame(val = c(c1f,c2f),
+                 k = vk,
+                 classe = c(rep('a[0,7.5]', 14),
+                            rep('b[8,15]', 15),
+                            rep('c[15.5,23]', 15),
+                            rep('d[23,30]', 15))
+)
+boxplot(T1F$val~T1F$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1F$val~T1F$classe)  # Absence d'homoscédasticité
+kruskal.test(T1F$val~T1F$classe)
+
+
+```
+##kp and f 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c3f= c(40. ,38. ,32. ,31. ,33. ,30. ,30. ,29. ,30. ,34. ,28. ,32. ,32. ,31. ,32. ,32. ,30. ,35.,
+       29. ,32. ,28. ,32. ,28. ,31. ,31.)
+c4f = c(33. ,28. ,28. ,32. ,31. ,35. ,30. ,32. ,28. ,32. ,32. ,31. ,30. ,26. ,32. ,24. ,31. ,33.,
+        29. ,31. ,30. ,32. ,32. ,29. ,30.)
+
+shapiro.test(c3f)
+shapiro.test(c4f)
+var.test(c3,c4f)
+# L'homoscédasticité n'est pas respectée
+boxplot(c3f,c4f)
+plot(c3f)
+plot(c4f)
+
+
+vkp = seq(0, 0.98 , 0.02)
+T2F  = data.frame(val = c(c3f,c4f),
+                 k = vkp,
+                 classe = c(rep('a[0,22]', 12),
+                            rep('b (0.22,0.48]', 13),
+                            rep('c(0.48,0.72]', 12),
+                            rep('d(0.72,1)', 13))
+)
+bartlett.test(T2F$val~T2F$classe)
+boxplot(T2F$val~T2F$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+kruskal.test(T2F$val~T2F$classe)
+```
+
+##k and g 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c5f= c( 0. ,20. ,19. ,20. ,22. ,27. ,25. ,20. ,23. ,18. ,19. ,23. ,21. ,23. ,26. ,27. ,26. ,18.,
+        23. ,25. ,26. ,24. ,23. ,24. ,23. ,24. ,23. ,27. ,30. ,20)
+c6f = c(24. ,24. ,25. ,23. ,22. ,26. ,22. ,26. ,21. ,30. ,26. ,21. ,23. ,18. ,24. ,17. ,29. ,22.,
+        22. ,25. ,22. ,23. ,29. ,22. ,23. ,27. ,24. ,23. ,25. ,22)
+
+c5f = c5f[2:30 ]
+shapiro.test(c5f)
+shapiro.test(c6f)
+boxplot(c5f,c6f)
+var.test(c5f,c6f)
+t.test(c5f, c6f)
+
+vk = seq(0.5, 29.5 , 0.5)
+T1gF  = data.frame(val = c(c5f,c6f),
+                  k = vk,
+                  classe = c(rep('a[0,7.5]', 14),
+                             rep('b[8,15]', 15),
+                             rep('c[15.5,23]', 15),
+                             rep('d[23,30]', 15))
+)
+boxplot(T1gF$val~T1gF$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1gF$val~T1gF$classe)
+kruskal.test(T1gF$val~T1gF$classe)
+wilcox.test(T1gF$val[T1gF$classe=='a[0,7.5]'],T1gF$val[T1gF$classe=='b[8,15]'])
+```
+##kp and g 40 simulation
+```{r eval=TRUE, echo=TRUE}
+c7f= c(39. ,28. ,25. ,26. ,17. ,27. ,30. ,25. ,19. ,23. ,23. ,30. ,23. ,24. ,23. ,21. ,23. ,26.,
+       20. ,24. ,24. ,24. ,23. ,28. ,14)
+c8f = c(15. ,23. ,26. ,18. ,25. ,24. ,21. ,27. ,24. ,20. ,25. ,19. ,22. ,24. ,22. ,21. ,20. ,27.,
+        22. ,24. ,24. ,19. ,20. ,19. ,22.)
+c7f = c7f[2:25]
+shapiro.test(c7f)
+shapiro.test(c8f)
+var.test(c7f,c8f)
+# L'homoscédasticité n'est pas respectée ni la normalité
+boxplot(c7f,c8f)
+plot(c7f)
+plot(c8f)
+
+
+vkp = seq(0.02, 0.98 , 0.02)
+T2gF  = data.frame(val = c(c7f,c8f),
+                  k = vkp,
+                  classe = c(rep('a[0,22]', 11),
+                             rep('b (0.22,0.48]', 13),
+                             rep('c(0.48,0.72]', 12),
+                             rep('d(0.72,1)', 13))
+)
+bartlett.test(T2gF$val~T2gF$classe) # l'homogénité des variances n'est pas réespectée
+boxplot(T2gF$val~T2gF$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+kruskal.test(T2gF$val~T2gF$classe)
+
+
+```
+# Evolution de la tempéraure 
+```{r eval=TRUE, echo=TRUE}
+
+
+Tt = 1:10000
+s1 = 5 * exp(-1/(1000*Tt))
+s2 = 1 * exp(-1/(1000*Tt))
+s3 = 8 * exp(-1/(1000*Tt))
+plot(Tt, s1, col='red')
+plot(Tt, s2, col='blue')
+plot(Tt, s3, col='green')
+
+```
+
+
+# Condition initiale fixe et k [0,15]
+## Pour f
+
+```{r eval=TRUE, echo=TRUE}
+c1 = c( 0. ,22. ,32. ,26. ,28. ,25. ,26. ,31. ,28. ,28. ,30. ,24. ,27. ,32. ,28. ,32. ,32. ,28. ,
+ 26. ,31. ,28. ,30. ,27. ,34. ,28. ,25. ,28. ,35. ,26. ,34.)
+
+c2 = c(30. ,28. ,29. ,33. ,25. ,30. ,34. ,32. ,31. ,27. ,33. ,34. ,32. ,33. ,32. ,29. ,28. ,32.,
+ 28. ,27. ,30. ,34. ,32. ,30. ,33. ,29. ,26. ,30. ,30. ,28.)
+c1 = c1[2:30 ]
+shapiro.test(c1)
+shapiro.test(c2)
+boxplot(c1,c2)
+var.test(c1,c2)
+t.test(c1, c2)
+t.test(c1, c2, 'less')
+vk = seq(0.25,14.75 , 0.25)
+T1  = data.frame(val = c(c1,c2),
+                 k = vk,
+                 classe = c(rep('a[0,3.5]', 14),
+                            rep('b(3.5,7.25]', 15),
+                            rep('c(7.25,11]', 15),
+                            rep('d(11,15]', 15))
+)
+boxplot(T1$val~T1$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1$val~T1$classe)
+kruskal.test(T1$val~T1$classe)
+
+library(DescTools)
+
+NemenyiTest(x = T1$val,
+                g = T1$classe,
+                 dist="tukey")
+
+```
+
+
+
+## Pour g
+```{r eval=TRUE, echo=TRUE}
+ c1 = c(0. ,20. ,25. ,18. ,23. ,28. ,22. ,25. ,22. ,23. ,20. ,16. ,12. ,24. ,25. ,22. ,20. ,22.,
+ 22. ,27. ,30. ,29. ,25. ,24. ,25. ,32. ,19. ,27. ,24. ,23.)
+ c2 =c( 25. ,22. ,29. ,24. ,22. ,23. ,21. ,23. ,29. ,23. ,24. ,23. ,23. ,23. ,17. ,20. ,16. ,25.,
+ 28. ,16. ,22. ,25. ,26. ,25. ,26. ,19. ,16. ,18. ,18. ,21.)
+
+mean(c(c1,c2))
+c1 = c1[2:30 ]
+shapiro.test(c1)
+shapiro.test(c2)
+boxplot(c1,c2)
+var.test(c1,c2)
+t.test(c1, c2)
+
+vk = seq(0.25,14.75 , 0.25)
+T1  = data.frame(val = c(c1,c2),
+                 k = vk,
+                 classe = c(rep('a[0,3.5]', 14),
+                            rep('b(3.5,7.25]', 15),
+                            rep('c(7.25,11]', 15),
+                            rep('d(11,15]', 15))
+)
+boxplot(T1$val~T1$classe, col=c('darkblue', 'darkred', 'gold', 'darkgreen'))
+bartlett.test(T1$val~T1$classe)
+kruskal.test(T1$val~T1$classe)
+
+
+```
+# Test effet du schéma de refroidissement (commerce du voyageur):
+
+## Effet sur le résultat distances à la fin du processus
+```{r eval=TRUE, echo=TRUE}
+d_inv = c(7.13846337713753, 8.208804492585957, 7.436882272855682, 8.487254438683271, 8.786948778177239, 5.8231221095684145, 7.074469679138735, 8.469238206071845, 7.481081422935187, 7.933385247156444, 7.382434381332461, 6.459465442978769, 5.915768177693335, 8.293130766685858, 5.803084972171561, 7.002949400739008, 7.151149174838908, 8.830164838442816, 6.3399783422525, 6.72892478654878, 8.593511563229377)
+
+d_inv_cube = c(5.680031035540712, 7.75113644027312, 7.851680998647313, 8.19906328697098, 8.153358096065483, 8.961010049823036, 7.083930673523021, 8.551578938887275, 9.474640702714192, 6.677598623611004, 7.547278225507751, 7.044687765707685, 8.938120062256367, 8.37057792373729, 7.8517603075490605, 6.714608283198613, 8.435074648761004, 7.611205974372229, 7.587249848279505, 5.950461421938065, 8.593511563229377)
+
+d_log = c(9.452290566320606, 11.875723796174194, 10.979556772554073, 14.464479611211603, 17.025383087940888, 10.101991596922227, 16.193502638452603, 15.340450104184926, 15.160692412670786, 14.403511642407008, 17.911465452915756, 12.012869470187914, 11.0664484354567, 15.861810354337482, 13.450087307306672, 12.743776825312546, 16.491859210385932, 12.26147421224768, 10.769944140961494, 11.86970264035974, 15.661676857853557)
+
+
+dist = c(d_inv, d_inv_cube, d_log)
+cat = c(rep('1/t', length(d_inv)) , rep('1/t^3' , length(d_inv_cube)), rep('1/log(t)', length(d_log)))
+dat_dist =  data.frame(dist = dist,
+                       cat = cat)
+
+boxplot(dat_dist$dist~dat_dist$cat, col=c('darkblue', 'skyblue', 'royalblue'))
+```
+
+## Temps de calcul
+
+```{r eval=TRUE, echo=TRUE}
+tps_inv =c(1082, 1163, 1205, 965, 1151, 1229, 1290, 1138, 956, 886, 950, 1050, 1169, 995, 1267, 1096, 922, 1094, 1004, 890, 894)
+tps_inv_cube = c(24, 13, 28, 23, 22, 17, 24, 28, 14, 22, 18, 44, 26, 49, 26, 34, 19, 13, 24, 20, 20)
+tps_log = c(6742, 6817, 6777, 6816, 6702, 6836, 6783, 6634, 6823, 6739, 6766, 6855, 6821, 6780, 6691, 6773, 6809, 6872, 6792, 6757, 6763)
+tps_dat = data.frame(tps = c(tps_inv, tps_inv_cube, tps_log),
+                     cat = c(rep('1/T', length(tps_inv)), rep('1/t^3' , length(tps_inv_cube)), rep('1/log(t)', length(tps_log))))
+boxplot(tps_dat$tps~ tps_dat$cat, col=c('darkgreen', 'darkolivegreen2', 'springgreen3'))
+```
+## Fonction de décroissance
+```{r eval=TRUE, echo=TRUE}
+X = 1:10000
+f1 =1/X
+f2 = 1/(X^3)
+f3 = 1/ log(X)
+f4 = 2/ log(X)
+
+{plot(X, f1, type='l',axes = TRUE)
+lines(X, f2, col='red')
+lines(X, f3, col='blue')
+lines(X, f4, col='green')}
+```
