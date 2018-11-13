@@ -107,12 +107,12 @@ def recuit_traveller (country , journey0, t0,k, kp ,tmax, A_rate_max, m, cooling
 def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m , cooling):
 	# np.copy 
 	j = [journey0]
-
 	d = [distance(journey0, country)]
-
-
 	t=t0
+	Time= [t0]
 	T = 1/t0
+	Var_proba =[]	
+	Var_perimetre =[]	
 
 	sort_country = np.zeros((np.shape(country)[0], np.shape(country)[1]))
 	for i,k in zip(j[-1], range(len(country))):
@@ -132,7 +132,6 @@ def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m , cooling):
 		for i in range(m):
 
 			jc= random_journey(np.copy(j[-1]))
-
 			S+= distance(jc,country) - distance(j[-1],country)
 			#print('i', i, 'jc',jc ,'j[-1]',j[-1],'S', S)
 		#print('S loop', S)
@@ -143,13 +142,20 @@ def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m , cooling):
 		if dd < d[-1]:
 			j.append(jj)
 			d.append(dd)
+			Time.append(1/t)
 
 		else :
-			if random.uniform(0,1) < kp * exp( -DE / (1000*T)):
+			var_proba = kp * exp( -DE / (1000*T))
+			Var_proba.append(var_proba)
+			if random.uniform(0,1) < var_proba:
 				j.append(jj)
 				d.append(dd)
-			
+				Time.append(t)
 
+			
+		Time.append(tmax)
+		distance_graph =d
+		distance_graph.append(d[-1])
 		sort_country = np.zeros((np.shape(country)[0], np.shape(country)[1]))
 		if t% 200 == 0 : 
 			for i,k in zip(j[-1], range(len(country))):
@@ -174,15 +180,31 @@ def recuit_traveller_display (country , journey0, t0, k, kp ,tmax, m , cooling):
 			T = 1/log(t)			
 	plt.ioff()   	
 	plt.draw() 
-	print('len j',len(j))
-	Ind  = np.arange(len(j))
+	print('len d',len(d))
+	Ind  = np.arange(len(d))
+	Ind_proba = np.arange(len(Var_proba))
 
 	fig = plt.figure(t + 1)
-	plt.plot(Ind, d )
+	plt.plot(Time, distance_graph )
+	
 	plt.ylabel('distance')	
 	plt.xlabel('Nb iterations')	
-	plt.xlim(0,tmax)
-	Title= 'distance %d' % 0
+
+	fig = plt.figure(t + 2)
+	plt.plot(Ind , d)
+	plt.ylabel('distance')	
+	plt.xlabel('Nb iterations')	
+	
+	Title= 'distance %d' % 2
+	fig.savefig(Title) 
+
+	fig = plt.figure(t + 3)
+	plt.plot(Ind_proba , Var_proba, c='navy')
+	plt.ylabel('proba d accepeter une mauvaise solution')
+	plt.ylim((-0.5,10))	
+	plt.xlabel('Nb itteration')	
+	
+	Title= 'Var_PROBA %d' % 3
 	fig.savefig(Title) 
 		
 	return  j,d,t		
@@ -198,8 +220,12 @@ if Which_question==1 :
 	#print(distance(T1, macarte))
 	#display(T1, macarte)
 
-
 if Which_question==2 :
+	macarte = (cities(3,10))
+	T1= np.arange(0,10)
+	recuit_traveller_display(macarte, T1, 1,10, 0.5 ,10000, 5, 'inv' )
+
+if Which_question==3 :
 	macarte = (cities(3,10))
 	print(macarte)
 	T1= np.arange(0,10)
@@ -285,7 +311,7 @@ if Which_question==2 :
 
 	plt.show()
 
-if Which_question==3 :
+if Which_question==4 :
 	Dist_inv = []
 	Dist_inv_cube = []
 	Dist_log = []
@@ -307,21 +333,21 @@ if Which_question==3 :
 		temps_inv_cube.append(len(s_inv_cube[1]))
 		temps_log.append(len(s_log[1]))
 
-print('Mean optimal distance for 1/t',  np.mean(Dist_inv))	
-print('Mean optimal distance for 1/t^3',  np.mean(Dist_inv_cube))		
-print('Mean optimal distance for 1/log(t)',  np.mean(Dist_log))
-# Merge_dist  = Dist_inv+ Dist_inv_cube + Dist_log
-# cooling = np.array(["1/t", "1/t^3", "1/log(t)"])
-# cooling  = np.repeat(Merge_dist, [len(Dist_inv), len(Dist_inv_cube), len(Dist_log)], axis=0)
-# data_dist = np.column_stack((cooling, Merge_dist))
-# boxplot(data_dist)
-print('Dist inv', Dist_inv)
-print('Dist inv cube', Dist_inv_cube)
-print('Dist inv log', Dist_log)
+	print('Mean optimal distance for 1/t',  np.mean(Dist_inv))	
+	print('Mean optimal distance for 1/t^3',  np.mean(Dist_inv_cube))		
+	print('Mean optimal distance for 1/log(t)',  np.mean(Dist_log))
+	# Merge_dist  = Dist_inv+ Dist_inv_cube + Dist_log
+	# cooling = np.array(["1/t", "1/t^3", "1/log(t)"])
+	# cooling  = np.repeat(Merge_dist, [len(Dist_inv), len(Dist_inv_cube), len(Dist_log)], axis=0)
+	# data_dist = np.column_stack((cooling, Merge_dist))
+	# boxplot(data_dist)	
+	print('Dist inv', Dist_inv)
+	print('Dist inv cube', Dist_inv_cube)
+	print('Dist inv log', Dist_log)
 
-print('Temps inv', temps_inv)
-print('TEmps inv cube', temps_inv_cube)
-print('Temp inv log',temps_log)
+	print('Temps inv', temps_inv)
+	print('TEmps inv cube', temps_inv_cube)
+	print('Temp inv log',temps_log)
 
 
 

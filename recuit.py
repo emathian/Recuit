@@ -40,16 +40,17 @@ def recuit_f1 ( xd,xp,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Tempe
 	t=t0
 	T = 1/t0
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
-	
+	prop_accep = []
 	while t < tmax  and A_rate > A_rate_max : # rmq nb max iter implique une condition sur la fct de cout
-		
-		xx = x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )	
+		xx = x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )
 		ff = f_1(xx)
 		if ff < f[-1]:
 			x.append(xx)
 			f.append(ff)
 		else :
-			if random.uniform(0,1) < kp * exp( -1 / (1000*T)):
+			P = kp * exp( -1 / (1000*T))
+			prop_accep.append(P)
+			if random.uniform(0,1) < P:
 				x.append(xx)
 				f.append(ff)
 				
@@ -57,12 +58,13 @@ def recuit_f1 ( xd,xp,t0, k, kp , tmax , A_rate_max ):	# t => time and T=> Tempe
 		T  = 1 / t 		
 		A_rate = len(x)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
 	
-	return  x,f,t	
+	return  x,f,t, prop_accep
 
 def recuit_f1_p (xp, xd, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> Temperature
 	x0 =random.uniform( xd, xp )
+	prop_accep = []
 
-	#
+	
 	x=[x0]
 	#print('x0 ', x0)
 	f=[f_1(x0)]
@@ -81,13 +83,16 @@ def recuit_f1_p (xp, xd, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> 
 
 		DE = 1/m * S
 		#print('DE', DE)
-		xx = x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )	
+		
+		xx = x[-1] +np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )
 		ff = f_1(xx)
 		if ff < f[-1]:
 			x.append(xx)
 			f.append(ff)
 		else :
-			if random.uniform(0,1) < kp * exp( -DE / (1000*T)):
+			P = kp * exp( -DE / (1000*T))
+			prop_accep.append(P)
+			if random.uniform(0,1) < P:
 				x.append(xx)
 				f.append(ff)
 
@@ -96,8 +101,7 @@ def recuit_f1_p (xp, xd, t0, k, kp, tmax , A_rate_max, m ):	# t => time and T=> 
 		T  = 1 / t 		
 		#A_rate = len(x)/t # nombre de mouvement réellement effectué par rapport au nombre d'iéttération total
 	
-	return  x,f,t		
-
+	return  x,f,t, prop_accep
 
 def recuit_g (xd,xp, yd,yp, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=> Temperature
 	x0 = random.uniform( xd, xp )
@@ -106,11 +110,14 @@ def recuit_g (xd,xp, yd,yp, t0, k, kp ,  tmax , A_rate_max ):	# t => time and T=
 	y=[y0]
 	f=[g(x0,y0)]
 	t=t0
+	prop_accep = []
+	surface =[]
 	T = 1/t0
 	A_rate = 1	# suppose qu'on commence par réduire la fonction de cout
 	
 	while t < tmax  and A_rate > A_rate_max : # rmq nb max iter implique une condition sur la fct de cout
-		
+		#print('DE', DE)
+
 		xx = x[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )	
 		yy = y[-1] + np.random.normal(0, sqrt(k* exp(-1/(1000*T))) ,1  )	
 		ff = g(xx,yy)
@@ -243,6 +250,9 @@ def stat(vp , F , n_rep , f , param , k_default, kp_default , tmax_default, sup_
 		'Statistique de student : ' , T_test,'\n',
 		'Pvalue bilaterale :' , pvB , '\n',
 		'Pvalue Unilateral  :', pvU )
+
+
+
 
 ###############################################################################################
 #								MAIN														  #	
@@ -684,12 +694,34 @@ if Which_question==8 :
 	print('nombre de succe7s avec paliers', Succes_ap)
 
 
+if Which_question==9 :
+	# Variation de k et k' pour f
+	S1 = recuit_f1( 0, 0 , 1, 10, 0.5 , 10000, 0.0001 )
+	S2 = recuit_f1_p ( 0, 0, 1, 10, 0.5 , 10000, 0.0001 , 5)
+	
+
+	fig = plt.figure(0)
+	
+	plt.plot(np.arange(len(S2[3])), S2[3],  '-o', c='skyblue')
+	plt.plot(np.arange(len(S1[3])), S1[3],  '-o',c='navy')
+
+	plt.xlabel("Nb iteration")
+	plt.ylabel("seuil de proba d acceptation")
+	plt.ylim(-1,2)
+	
+	fig = plt.figure(1)
+	plt.plot(np.arange(len(S2[3])), S2[3],  '-o', c='skyblue')
+	plt.xlabel("Nb iteration")
+	plt.ylabel("seuil de proba d acceptation")
+
+	
+
+	plt.show()
+
+	t =np.arange(0,10000)
 
 
-
-
-
-
-
+	plt.show()
+# x,f,t, prop_accep, surface	
 
 
